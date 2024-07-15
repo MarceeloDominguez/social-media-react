@@ -41,8 +41,6 @@ export default function SigninForm() {
       password: values.password,
     });
 
-    //session
-
     if (!session) {
       return toast({ title: "Sign up failed. Please try again." });
     }
