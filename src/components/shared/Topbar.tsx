@@ -3,11 +3,12 @@ import { Link, useNavigate } from "react-router-dom";
 import { Button } from "../ui/button";
 import { useSignOutAccount } from "@/lib/react-query/queriesAndMutations";
 import { useUserContext } from "@/context/AuthContext";
+import Loader from "./Loader";
 
 export default function Topbar() {
   const { mutate: signOutAccount, isSuccess } = useSignOutAccount();
   const navigate = useNavigate();
-  const { user } = useUserContext();
+  const { user, isLoading } = useUserContext();
 
   useEffect(() => {
     if (isSuccess) navigate(0);
@@ -29,11 +30,17 @@ export default function Topbar() {
             <img src="/assets/icons/logout.svg" alt="logout" />
           </Button>
           <Link to={`/profile/${user.id}`} className="flex-center gap-3">
-            <img
-              src={user.imageUrl || "/assets/icons/profile-placeholder.svg"}
-              className="h-8 w-8 rounded-full"
-              alt="profile"
-            />
+            {isLoading ? (
+              <div className="h-8 w-8 flex">
+                <Loader />
+              </div>
+            ) : (
+              <img
+                src={user.imageUrl || "/assets/icons/profile-placeholder.svg"}
+                className="h-8 w-8 rounded-full"
+                alt="profile"
+              />
+            )}
           </Link>
         </div>
       </div>

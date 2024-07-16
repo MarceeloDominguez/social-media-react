@@ -5,12 +5,13 @@ import { INavLink } from "@/types";
 import { useEffect } from "react";
 import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "../ui/button";
+import Loader from "./Loader";
 
 export default function LeftSidebar() {
   const { mutate: signOutAccount, isSuccess } = useSignOutAccount();
   const navigate = useNavigate();
   const { pathname } = useLocation();
-  const { user } = useUserContext();
+  const { user, isLoading } = useUserContext();
 
   useEffect(() => {
     if (isSuccess) navigate(0);
@@ -23,15 +24,23 @@ export default function LeftSidebar() {
           <h2 className="h3-bold md:h2-bold">SocialMedia</h2>
         </Link>
         <Link to={`/profile/${user.id}`} className="flex gap-3 items-center">
-          <img
-            src={user.imageUrl || "/assets/icons/profile-placeholder.svg"}
-            className="h-14 w-14 rounded-full"
-            alt="profile"
-          />
-          <div className="flex flex-col">
-            <p className="body-bold">{user.name}</p>
-            <p className="small-regular text-light-3">@{user.username}</p>
-          </div>
+          {isLoading ? (
+            <p className="h-14 w-full flex items-center justify-center">
+              <Loader />
+            </p>
+          ) : (
+            <>
+              <img
+                src={user.imageUrl || "/assets/icons/profile-placeholder.svg"}
+                className="h-14 w-14 rounded-full"
+                alt="profile"
+              />
+              <div className="flex flex-col">
+                <p className="body-bold">{user.name}</p>
+                <p className="small-regular text-light-3">@{user.username}</p>
+              </div>
+            </>
+          )}
         </Link>
         <ul className="flex flex-col gap-6">
           {sidebarLinks.map((link: INavLink) => {
