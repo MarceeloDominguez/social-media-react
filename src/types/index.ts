@@ -1,3 +1,4 @@
+import { Models } from "appwrite";
 import React from "react";
 
 export type INavLink = {
@@ -20,8 +21,25 @@ export type INewPost = {
   caption: string;
   file: File[];
   location?: string;
-  tags?: string;
+  tags?: string[] | string;
+  imageUrl: string;
+  creator: Creator;
+  likes: Likes[];
 };
+
+type Creator = {
+  $id: string;
+  imageUrl: string;
+  name: string;
+  username: string;
+  email: string;
+};
+
+type Likes = {
+  $id: string;
+};
+
+export type PostDocument = Models.Document & INewPost;
 
 export type IUpdatePost = {
   postId: string;
