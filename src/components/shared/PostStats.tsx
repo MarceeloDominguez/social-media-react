@@ -1,4 +1,3 @@
-import { useUserContext } from "@/context/AuthContext";
 import {
   useDeleteSavedPost,
   useGetCurrentUser,
@@ -17,7 +16,7 @@ type PostStatsProps = {
 };
 
 export default function PostStats({ post, userId }: PostStatsProps) {
-  const likesList = post.likes.map((user) => user.$id);
+  const likesList = post.likes?.map((user) => user.$id);
 
   const [likes, setLikes] = useState(likesList);
   const [isSaved, setIsSaved] = useState(false);
@@ -40,7 +39,7 @@ export default function PostStats({ post, userId }: PostStatsProps) {
   const handleLikePost = (e: React.MouseEvent) => {
     e.stopPropagation();
 
-    let newLikes = [...likes];
+    let newLikes = [...likes!];
 
     const hasLiked = newLikes.includes(userId);
 
@@ -71,7 +70,7 @@ export default function PostStats({ post, userId }: PostStatsProps) {
       <div className="flex gap-2 mr-5">
         <img
           src={
-            checkIsLiked(likes, userId)
+            checkIsLiked(likes!, userId)
               ? "/assets/icons/liked.svg"
               : "/assets/icons/like.svg"
           }
@@ -82,7 +81,7 @@ export default function PostStats({ post, userId }: PostStatsProps) {
           className="cursor-pointer"
         />
 
-        <p className="small-medium lg:base-medium">{likes.length}</p>
+        <p className="small-medium lg:base-medium">{likes?.length}</p>
       </div>
 
       <div>

@@ -22,9 +22,9 @@ export type INewPost = {
   file: File[];
   location?: string;
   tags?: string[] | string;
-  imageUrl: string;
-  creator: Creator;
-  likes: Likes[];
+  imageUrl?: string;
+  creator?: Creator;
+  likes?: Likes[];
 };
 
 type Creator = {
