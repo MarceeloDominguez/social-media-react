@@ -5,18 +5,17 @@ import {
   useSavePost,
 } from "@/lib/react-query/queriesAndMutations";
 import { checkIsLiked } from "@/lib/utils";
-import { PostDocument } from "@/types";
 import { Models } from "appwrite";
 import React, { useEffect, useState } from "react";
 import Loader from "./Loader";
 
 type PostStatsProps = {
-  post: PostDocument;
+  post: Models.Document;
   userId: string;
 };
 
 export default function PostStats({ post, userId }: PostStatsProps) {
-  const likesList = post.likes?.map((user) => user.$id);
+  const likesList = post.likes?.map((user: Models.Document) => user.$id);
 
   const [likes, setLikes] = useState(likesList);
   const [isSaved, setIsSaved] = useState(false);

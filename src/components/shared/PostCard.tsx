@@ -3,7 +3,6 @@ import { multiFormatDateString, processTags } from "@/lib/utils";
 import { PostDocument } from "@/types";
 import { Link } from "react-router-dom";
 import PostStats from "./PostStats";
-import Loader from "./Loader";
 
 type PostCardProps = {
   post: PostDocument;
