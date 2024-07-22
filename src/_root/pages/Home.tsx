@@ -1,6 +1,10 @@
 import Loader from "@/components/shared/Loader";
 import PostCard from "@/components/shared/PostCard";
-import { useGetRecentPosts } from "@/lib/react-query/queriesAndMutations";
+import UserCard from "@/components/shared/UserCard";
+import {
+  useGetRecentPosts,
+  useGetUsers,
+} from "@/lib/react-query/queriesAndMutations";
 import { PostDocument } from "@/types";
 
 export default function Home() {
@@ -9,6 +13,25 @@ export default function Home() {
     isPending: isPostLoading,
     isError: isErrorPosts,
   } = useGetRecentPosts();
+
+  const {
+    data: users,
+    isLoading: isUserLoading,
+    isError: isErrorUser,
+  } = useGetUsers(10);
+
+  if (isErrorPosts || isErrorUser) {
+    return (
+      <div className="flex flex-1">
+        <div className="home-container">
+          <p className="body-medium text-light-1">Something bad happened</p>
+        </div>
+        <div className="home-creators">
+          <p className="body-medium text-light-1">Something bad happened</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-1">
@@ -25,6 +48,21 @@ export default function Home() {
             </ul>
           )}
         </div>
+      </div>
+
+      <div className="home-creators">
+        <h3 className="h3-bold text-light-1">Top Creators</h3>
+        {isUserLoading && !users ? (
+          <Loader />
+        ) : (
+          <ul className="grid 2xl:grid-cols-2 gap-6">
+            {users?.documents.map((user) => (
+              <li key={user.$id}>
+                <UserCard user={user} />
+              </li>
+            ))}
+          </ul>
+        )}
       </div>
     </div>
   );

@@ -2,6 +2,8 @@ import { INewPost, INewUser, IUpdatePost, PostDocument } from "@/types";
 import { account, appwriteConfig, avatars, databases, storage } from "./config";
 import { ID, Models, Query } from "appwrite";
 
+//AUTH FUNCTIONS
+
 export async function createUserAccount(user: INewUser) {
   try {
     const newAccount = await account.create(
@@ -107,6 +109,8 @@ export async function signOutAccount() {
     console.log(error);
   }
 }
+
+//POSTS FUNCTIONS
 
 //Create Post
 export async function createPost(post: INewPost) {
@@ -220,7 +224,7 @@ export async function getRecentPosts(): Promise<
   return posts;
 }
 
-//Like Post
+//Like/unlike Post
 export async function likePost(postId: string, likesArray: string[]) {
   try {
     const updatedPost = await databases.updateDocument(
@@ -401,6 +405,30 @@ export async function searchPosts(searchTerm: string) {
     if (!posts) throw Error;
 
     return posts;
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+//USER FUNCTIONS
+
+export async function getUsers(limit?: number) {
+  const queries: string[] = [Query.orderDesc("$createdAt")];
+
+  if (limit) {
+    queries.push(Query.limit(limit));
+  }
+
+  try {
+    const users = await databases.listDocuments(
+      appwriteConfig.databaseId,
+      appwriteConfig.userCollectionId,
+      queries
+    );
+
+    if (!users) throw Error;
+
+    return users;
   } catch (error) {
     console.log(error);
   }
