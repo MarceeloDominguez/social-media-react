@@ -92,6 +92,7 @@ export async function getCurrentUser() {
       bio: userDoc.bio,
       save: userDoc.save,
       post: userDoc.posts,
+      liked: userDoc.liked,
     };
 
     return user;

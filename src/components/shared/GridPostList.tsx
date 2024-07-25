@@ -2,6 +2,7 @@ import { useUserContext } from "@/context/AuthContext";
 import { Models } from "appwrite";
 import { Link } from "react-router-dom";
 import PostStats from "./PostStats";
+import Loader from "./Loader";
 
 type GridPostListProps = {
   posts: Models.Document[];
@@ -15,6 +16,13 @@ export default function GridPostList({
   showStats = true,
 }: GridPostListProps) {
   const { user } = useUserContext();
+
+  if (!posts)
+    return (
+      <div className="flex-center w-full h-full">
+        <Loader />
+      </div>
+    );
 
   return (
     <ul className="grid-container">
