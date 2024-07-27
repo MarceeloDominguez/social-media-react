@@ -1,11 +1,27 @@
+import { convertFileToUrl } from "@/lib/utils";
 import { useCallback, useState } from "react";
 import { FileWithPath, useDropzone } from "react-dropzone";
 
-export default function ProfileUploader() {
-  const [file, setFile] = useState<File[]>([]);
-  const [fileUrl, setFileUrl] = useState<string>("");
+type ProfileUploaderProps = {
+  fieldChange: (files: File[]) => void;
+  mediaUrl: string;
+};
 
-  const onDrop = useCallback(() => {}, [file]);
+export default function ProfileUploader({
+  fieldChange,
+  mediaUrl,
+}: ProfileUploaderProps) {
+  const [file, setFile] = useState<File[]>([]);
+  const [fileUrl, setFileUrl] = useState<string>(mediaUrl);
+
+  const onDrop = useCallback(
+    (acceptedFiles: FileWithPath[]) => {
+      setFile(acceptedFiles);
+      fieldChange(acceptedFiles);
+      setFileUrl(convertFileToUrl(acceptedFiles[0]));
+    },
+    [file]
+  );
 
   const { getRootProps, getInputProps } = useDropzone({
     onDrop,
@@ -20,7 +36,7 @@ export default function ProfileUploader() {
 
       <div className="cursor-pointer flex-center gap-4">
         <img
-          src={"/assets/icons/profile-placeholder.svg"}
+          src={fileUrl || "/assets/icons/profile-placeholder.svg"}
           alt="update-image"
           className="h-24 w-24 rounded-full object-cover object-top"
         />

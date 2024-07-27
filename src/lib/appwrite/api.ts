@@ -1,4 +1,10 @@
-import { INewPost, INewUser, IUpdatePost, PostDocument } from "@/types";
+import {
+  INewPost,
+  INewUser,
+  IUpdatePost,
+  IUpdateUser,
+  PostDocument,
+} from "@/types";
 import { account, appwriteConfig, avatars, databases, storage } from "./config";
 import { ID, Models, Query } from "appwrite";
 
@@ -446,6 +452,64 @@ export async function getUserById(userId: string) {
     if (!user) throw Error;
 
     return user;
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+export async function updateUser(user: IUpdateUser) {
+  const hasFileToUpdate = user.file.length > 0;
+
+  try {
+    let image = {
+      imageUrl: user.imageUrl,
+      imageId: user.imageId,
+    };
+
+    if (hasFileToUpdate) {
+      const uploadedFile = await uploadFile(user.file[0]);
+      if (!uploadFile) throw Error;
+
+      const fileUrl = getFilePreview(uploadedFile?.$id!);
+      if (!fileUrl) {
+        await deleteFile(uploadedFile?.$id!);
+        throw Error;
+      }
+
+      image = { ...image, imageUrl: fileUrl, imageId: uploadedFile?.$id! };
+    }
+
+    //update user
+    const updatedUser = await databases.updateDocument(
+      appwriteConfig.databaseId,
+      appwriteConfig.userCollectionId,
+      user.userId,
+      {
+        name: user.name,
+        bio: user.bio,
+        email: user.email,
+        username: user.username,
+        imageUrl: image.imageUrl,
+        imageId: image.imageId,
+      }
+    );
+
+    if (!updatedUser) {
+      if (hasFileToUpdate) {
+        await deleteFile(image.imageId);
+      }
+
+      throw Error;
+    }
+
+    //Actualizar el correo electrónico del user en el sistema de autenticación
+    //await account.updateEmail(user.email, currentPassword);
+
+    if (user.imageId && hasFileToUpdate) {
+      await deleteFile(user.imageId);
+    }
+
+    return updatedUser;
   } catch (error) {
     console.log(error);
   }

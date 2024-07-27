@@ -19,8 +19,6 @@ export default function Profile() {
   const { user } = useUserContext();
   const { pathname } = useLocation();
 
-  console.log(pathname);
-
   const { data: currentUser } = useGetUserById(id || "");
 
   if (!currentUser)

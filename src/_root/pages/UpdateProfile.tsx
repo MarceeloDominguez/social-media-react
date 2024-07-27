@@ -14,9 +14,22 @@ import { ProfileValidation } from "@/lib/validation";
 import ProfileUploader from "@/components/shared/ProfileUploader";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { useNavigate, useParams } from "react-router-dom";
+import {
+  useGetUserById,
+  useUpdateUser,
+} from "@/lib/react-query/queriesAndMutations";
+import { useToast } from "@/components/ui/use-toast";
+import Loader from "@/components/shared/Loader";
 
 export default function UpdateProfile() {
-  const { user } = useUserContext();
+  const { toast } = useToast();
+  const navigate = useNavigate();
+  const { user, setUser } = useUserContext();
+  const { id } = useParams();
+  const { data: currentUser } = useGetUserById(id || "");
+  const { mutateAsync: updateUser, isPending: isLoadingUpdate } =
+    useUpdateUser();
 
   const form = useForm<z.infer<typeof ProfileValidation>>({
     resolver: zodResolver(ProfileValidation),
@@ -29,7 +42,40 @@ export default function UpdateProfile() {
     },
   });
 
-  const handleUpdate = () => {};
+  if (!currentUser)
+    return (
+      <div className="flex-center w-full h-full">
+        <Loader />
+      </div>
+    );
+
+  const handleUpdate = async (value: z.infer<typeof ProfileValidation>) => {
+    const updatedUser = await updateUser({
+      userId: currentUser.$id,
+      name: value.name,
+      bio: value.bio,
+      file: value.file,
+      //email: value.email,
+      username: value.username,
+      imageUrl: currentUser.imageUrl,
+      imageId: currentUser.imageId,
+    });
+
+    if (!updatedUser) {
+      toast({ title: "Update user failed. Please try again." });
+    }
+
+    setUser({
+      ...user,
+      name: updatedUser?.name,
+      bio: updatedUser?.bio,
+      imageUrl: updatedUser?.imageUrl,
+      //email: updatedUser?.email,
+      username: updatedUser?.username,
+    });
+
+    return navigate(`/profile/${id}`);
+  };
 
   return (
     <div className="flex flex-1">
@@ -56,7 +102,10 @@ export default function UpdateProfile() {
               render={({ field }) => (
                 <FormItem className="flex">
                   <FormControl>
-                    <ProfileUploader />
+                    <ProfileUploader
+                      fieldChange={field.onChange}
+                      mediaUrl={currentUser?.imageUrl}
+                    />
                   </FormControl>
                   <FormMessage className="shad-form_message" />
                 </FormItem>
@@ -88,7 +137,7 @@ export default function UpdateProfile() {
                 </FormItem>
               )}
             />
-            <FormField
+            {/* <FormField
               control={form.control}
               name="email"
               render={({ field }) => (
@@ -100,7 +149,7 @@ export default function UpdateProfile() {
                   <FormMessage className="shad-form_message" />
                 </FormItem>
               )}
-            />
+            /> */}
             <FormField
               control={form.control}
               name="bio"
@@ -125,7 +174,9 @@ export default function UpdateProfile() {
               <Button
                 type="submit"
                 className="shad-button_primary whitespace-nowrap"
+                disabled={isLoadingUpdate}
               >
+                {isLoadingUpdate && <Loader />}
                 Update Profile
               </Button>
             </div>

@@ -24,6 +24,7 @@ export const ProfileValidation = z.object({
     .min(2, { message: "Name must be at least 2 characters." }),
   email: z.string().email(),
   bio: z.string(),
+  password: z.string().optional(),
 });
 
 export const PostValidation = z.object({
