@@ -16,6 +16,7 @@ export type IUpdateUser = {
   file: File[];
   email?: string;
   username: string;
+  currentPassword?: string;
 };
 
 export type INewPost = {

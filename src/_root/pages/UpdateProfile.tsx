@@ -21,6 +21,7 @@ import {
 } from "@/lib/react-query/queriesAndMutations";
 import { useToast } from "@/components/ui/use-toast";
 import Loader from "@/components/shared/Loader";
+import { useEffect, useState } from "react";
 
 export default function UpdateProfile() {
   const { toast } = useToast();
@@ -30,6 +31,7 @@ export default function UpdateProfile() {
   const { data: currentUser } = useGetUserById(id || "");
   const { mutateAsync: updateUser, isPending: isLoadingUpdate } =
     useUpdateUser();
+  const [isEmailChanged, setIsEmailChanged] = useState(false);
 
   const form = useForm<z.infer<typeof ProfileValidation>>({
     resolver: zodResolver(ProfileValidation),
@@ -41,6 +43,13 @@ export default function UpdateProfile() {
       bio: user.bio || "",
     },
   });
+
+  const { watch } = form;
+  const email = watch("email");
+
+  useEffect(() => {
+    setIsEmailChanged(email !== currentUser?.email);
+  }, [email, currentUser?.email]);
 
   if (!currentUser)
     return (
@@ -55,10 +64,11 @@ export default function UpdateProfile() {
       name: value.name,
       bio: value.bio,
       file: value.file,
-      //email: value.email,
+      email: value.email,
       username: value.username,
       imageUrl: currentUser.imageUrl,
       imageId: currentUser.imageId,
+      currentPassword: value.password,
     });
 
     if (!updatedUser) {
@@ -70,7 +80,7 @@ export default function UpdateProfile() {
       name: updatedUser?.name,
       bio: updatedUser?.bio,
       imageUrl: updatedUser?.imageUrl,
-      //email: updatedUser?.email,
+      email: updatedUser?.email,
       username: updatedUser?.username,
     });
 
@@ -137,7 +147,7 @@ export default function UpdateProfile() {
                 </FormItem>
               )}
             />
-            {/* <FormField
+            <FormField
               control={form.control}
               name="email"
               render={({ field }) => (
@@ -149,7 +159,28 @@ export default function UpdateProfile() {
                   <FormMessage className="shad-form_message" />
                 </FormItem>
               )}
-            /> */}
+            />
+            {isEmailChanged && (
+              <FormField
+                control={form.control}
+                name="password"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="shad-form_label">
+                      Current Password
+                    </FormLabel>
+                    <FormControl>
+                      <Input
+                        type="password"
+                        className="shad-input"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage className="shad-form_message" />
+                  </FormItem>
+                )}
+              />
+            )}
             <FormField
               control={form.control}
               name="bio"

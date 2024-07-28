@@ -503,7 +503,7 @@ export async function updateUser(user: IUpdateUser) {
     }
 
     //Actualizar el correo electrónico del user en el sistema de autenticación
-    //await account.updateEmail(user.email, currentPassword);
+    await account.updateEmail(user.email!, user.currentPassword!);
 
     if (user.imageId && hasFileToUpdate) {
       await deleteFile(user.imageId);
